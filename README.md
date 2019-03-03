@@ -7,7 +7,7 @@ You can import the project into an IDE as a Maven project and run the main class
 
 /customer-management/src/main/java/com/jlab/customermanagement/CustomerManagementApplication.java
 
-To create a customer by post data to the api /api/v1/customers. Example 
+To create a customer post data to the api /api/v1/customers. Example 
 ```
 curl -i -X POST \
   http://localhost:8080/api/v1/customers \
