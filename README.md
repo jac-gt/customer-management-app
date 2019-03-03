@@ -1,5 +1,5 @@
 
-## A demo Srping Boot application for managing customers using REST API
+## A demo Spring Boot application for managing customers using REST API
 
 This is a Java Srping Boot application to perform CRUD operations using a REST API.
 
