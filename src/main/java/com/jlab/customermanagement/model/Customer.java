@@ -33,7 +33,6 @@ public class Customer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@JsonIgnore
 	@Column(name = "CUSTOMER_ID")
 	private long id;
 
