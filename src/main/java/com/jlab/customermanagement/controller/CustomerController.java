@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,4 +64,34 @@ public class CustomerController {
 		return customerService.all();
 	}
 
+	/**
+	 * 
+	 * @param customer The customer details to be updated in the repository
+	 * @param customerId The id of the customer from the URL
+	 * @return
+	 */
+	@PutMapping("/customers/{customerId}")
+	public ResponseEntity<Object> saveCustomer(@Valid @RequestBody Customer customer, @PathVariable long customerId) {
+		// Get the existing customer. If the customer is not found a CustomerNotFound
+		// exception will be thrown from the
+		// service method and will be handled in the controller advice and an error will
+		// be returned to the client
+		customerService.one(customerId);
+
+		// If the customer exists then update the new customer details in the repository
+		customer.setId(customerId);
+
+		customerService.save(customer);
+
+		return ResponseEntity.noContent().build();
+	}
+	
+	/**
+	 * 
+	 * @param customerId Id of the Customer to delete
+	 */
+	@DeleteMapping("/customers/{customerId}")
+	public void deleteCustomer(@PathVariable long customerId) {
+		customerService.delete(customerId);
+	}
 }

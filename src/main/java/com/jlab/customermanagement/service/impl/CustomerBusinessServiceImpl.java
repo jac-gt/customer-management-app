@@ -19,11 +19,11 @@ public class CustomerBusinessServiceImpl implements CustomerService {
 	@Override
 	public Customer save(Customer customer) {
 		return repo.save(customer);
-		
+
 	}
-	
+
 	@Override
-	public List<Customer> all() {	
+	public List<Customer> all() {
 		return repo.findAll();
 	}
 
@@ -32,5 +32,10 @@ public class CustomerBusinessServiceImpl implements CustomerService {
 		return repo.findById(id).orElseThrow(() -> new CustomerNotFoundException(id));
 	}
 
-	
+	@Override
+	public void delete(long customerId) {
+		repo.deleteById(customerId);
+
+	}
+
 }

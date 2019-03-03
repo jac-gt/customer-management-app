@@ -12,12 +12,15 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.jlab.customermanagement.exceptions.CustomerNotFoundException;
+
 @ControllerAdvice
 public class GlobalControllerAdvice {
-
+		
 	@ExceptionHandler({ MethodArgumentNotValidException.class })
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
 		List<String> errors = new ArrayList<String>();
@@ -49,5 +52,10 @@ public class GlobalControllerAdvice {
 
 		ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), error);
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+	}
+	
+	@ExceptionHandler(CustomerNotFoundException.class)
+	public ResponseEntity<Object> customerNotFoundHandler(CustomerNotFoundException ex) {
+		return new ResponseEntity<Object>( new ApiError(HttpStatus.BAD_REQUEST, "Not Found", ex.getMessage() ), HttpStatus.NOT_FOUND);
 	}
 }

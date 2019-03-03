@@ -31,6 +31,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jlab.customermanagement.exceptions.CustomerNotFoundException;
 import com.jlab.customermanagement.model.Customer;
 import com.jlab.customermanagement.service.CustomerService;
 
@@ -138,10 +139,61 @@ public class CustomerControllerTest {
 
 		MvcResult response = mockMvc.perform(request).andExpect(status().isBadRequest()).andReturn();
 
-		JSONAssert.assertEquals(
-				"{ \"errors\": [ \"customerId should be of type long\"]}",
+		JSONAssert.assertEquals("{ \"errors\": [ \"customerId should be of type long\"]}",
 				response.getResponse().getContentAsString(), false);
 
 	}
 
+	@Test
+	public void getNonExistantCustomer_test() throws JsonProcessingException, Exception {
+
+		long nonExistantCustomerId = 1000;
+
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(API_PATH + "/" + nonExistantCustomerId)
+				.accept(MediaType.APPLICATION_JSON);
+
+		when(custService.one(nonExistantCustomerId)).thenThrow(new CustomerNotFoundException(nonExistantCustomerId));
+
+		MvcResult response = mockMvc.perform(request).andExpect(status().isNotFound())
+				.andExpect(content().json("{\"errors\": [\"Customer with id 1000 not found.\" ]}")).andReturn();
+
+	}
+
+	@Test
+	public void saveExistingCustomer_test() throws JsonProcessingException, Exception {
+
+		long existingCustomerId = 1;
+
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.put(API_PATH + "/" + existingCustomerId)
+				.content(mapper.writeValueAsBytes(validCustomer)).contentType(MediaType.APPLICATION_JSON);
+
+		when(custService.one(existingCustomerId)).thenReturn(validCustomer);
+
+		MvcResult response = mockMvc.perform(request).andExpect(status().isNoContent()).andReturn();
+
+	}
+
+	@Test
+	public void saveNonExistantCustomer_test() throws JsonProcessingException, Exception {
+
+		long nonExistantCustomerId = 1000;
+
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.put(API_PATH + "/" + nonExistantCustomerId)
+				.content(mapper.writeValueAsBytes(validCustomer)).contentType(MediaType.APPLICATION_JSON);
+
+		when(custService.one(nonExistantCustomerId)).thenThrow(new CustomerNotFoundException(nonExistantCustomerId));
+
+		MvcResult response = mockMvc.perform(request).andExpect(status().isNotFound()).andReturn();
+
+	}
+
+	@Test
+	public void deleteCustomer_test() throws JsonProcessingException, Exception {
+
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete(API_PATH + "/" + 1)
+				.content(mapper.writeValueAsBytes(validCustomer)).contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult response = mockMvc.perform(request).andExpect(status().isOk()).andReturn();
+
+	}
 }
