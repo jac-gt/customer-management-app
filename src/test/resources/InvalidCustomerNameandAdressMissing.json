@@ -1,0 +1,20 @@
+ {
+	"title": "Mr",
+	"sex": "Male",	
+	"initials": "J",
+	"maritalStatus": "Married",
+	"creditRating": 50,
+	"nabCustomer": true,
+	"address": [
+		{
+			"type": "Residence",
+			"unitNo": 1,
+			"streetName": "ABC Street",
+			"suburb": "XYZ Suburb",
+			"city": "Melbourne",
+			"state": "Vic",
+			"country": "Australia",
+			"pincode": "1000"
+		}
+		]
+}

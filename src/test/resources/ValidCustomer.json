@@ -1,0 +1,35 @@
+ {
+ 	"fullName": {
+		"firstName": "ABC",
+		"lastName": "DEF",
+		"middleName": "Hij"
+	},
+	"title": "Mr",
+	"sex": "Male",	
+	"initials": "J",
+	"maritalStatus": "Married",
+	"creditRating": 50,
+	"nabCustomer": true,
+	"address": [
+		{
+			"type": "Residence",
+			"unitNo": 1,
+			"streetName": "ABC Street",
+			"suburb": "XYZ Suburb",
+			"city": "Melbourne",
+			"state": "Vic",
+			"country": "Australia",
+			"pincode": "1000"
+		},
+		{
+			"type": "Mailing",
+			"unitNo": 100,
+			"streetName": "ABC Street",
+			"suburb": "DEF",
+			"city": "Perth",
+			"state": "WA",
+			"country": "Australia",
+			"pincode": "6000"
+		}
+	]
+}
