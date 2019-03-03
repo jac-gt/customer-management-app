@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,7 +49,6 @@ public class CustomerControllerTest {
 	private Customer validCustomer;
 
 	private Customer invalidCustomerNameandAddressMissing;
-	
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -58,10 +58,9 @@ public class CustomerControllerTest {
 		validCustomer = mapper.readValue(ResourceUtils.getFile("src/test/resources/ValidCustomer.json"),
 				Customer.class);
 
-		invalidCustomerNameandAddressMissing = mapper
-				.readValue(ResourceUtils.getFile("src/test/resources/InvalidCustomerNameandAdressMissing.json"), Customer.class);
-		
-		
+		invalidCustomerNameandAddressMissing = mapper.readValue(
+				ResourceUtils.getFile("src/test/resources/InvalidCustomerNameandAdressMissing.json"), Customer.class);
+
 	}
 
 	@Test
@@ -88,27 +87,61 @@ public class CustomerControllerTest {
 
 	@Test
 	public void createCustomerNameandAdressMissing_test() throws Exception {
-		
+
 		// Create request
 		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(API_PATH)
-				.content(mapper.writeValueAsBytes(invalidCustomerNameandAddressMissing)).contentType(MediaType.APPLICATION_JSON);
-		
-		MvcResult response =  mockMvc.perform(request).andExpect(status().isBadRequest()).andReturn();
-		
-		JSONAssert.assertEquals("{ \"errors\": [ \"address: Invalid Address. Address must contain a residence and a mailing address\"," + 
-				" \"fullName: First and last name must not be null and name fields must not be more than 200 characters\"]}", response.getResponse().getContentAsString(), false);
-	}
-	
-	@Test
-	public void createCustomerWrongValueForMaritalStatus_test() throws Exception {
-		
-		// Create request
-		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(API_PATH)
-				.content( mapper.writeValueAsString(validCustomer).replace("Male", "Ma")).contentType(MediaType.APPLICATION_JSON);
-		
-		MvcResult response =  mockMvc.perform(request).andExpect(status().isBadRequest()).andReturn();
-		
+				.content(mapper.writeValueAsBytes(invalidCustomerNameandAddressMissing))
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult response = mockMvc.perform(request).andExpect(status().isBadRequest()).andReturn();
+
+		JSONAssert.assertEquals(
+				"{ \"errors\": [ \"address: Invalid Address. Address must contain a residence and a mailing address\","
+						+ " \"fullName: First and last name must not be null and name fields must not be more than 200 characters\"]}",
+				response.getResponse().getContentAsString(), false);
 	}
 
+	@Test
+	public void createCustomerWrongValueForMaritalStatus_test() throws Exception {
+
+		// Create request
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(API_PATH)
+				.content(mapper.writeValueAsString(validCustomer).replace("Male", "Ma"))
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult response = mockMvc.perform(request).andExpect(status().isBadRequest()).andReturn();
+
+	}
+
+	@Test
+	public void getCustomerWithValidCustomerId_test() throws JsonProcessingException, Exception {
+
+		long newCustomerId = 1;
+
+		validCustomer.setId(newCustomerId);
+
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(API_PATH + "/" + newCustomerId)
+				.accept(MediaType.APPLICATION_JSON);
+
+		when(custService.one(newCustomerId)).thenReturn(validCustomer);
+
+		mockMvc.perform(request).andExpect(status().isOk())
+				.andExpect(content().json(mapper.writeValueAsString(validCustomer))).andReturn();
+
+	}
+
+	@Test
+	public void getCustomerWithInValidCustomerId_test() throws JsonProcessingException, Exception {
+
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(API_PATH + "/a")
+				.accept(MediaType.APPLICATION_JSON);
+
+		MvcResult response = mockMvc.perform(request).andExpect(status().isBadRequest()).andReturn();
+
+		JSONAssert.assertEquals(
+				"{ \"errors\": [ \"customerId should be of type long\"]}",
+				response.getResponse().getContentAsString(), false);
+
+	}
 
 }

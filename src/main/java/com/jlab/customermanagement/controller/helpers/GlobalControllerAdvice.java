@@ -1,11 +1,7 @@
 package com.jlab.customermanagement.controller.helpers;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 public class GlobalControllerAdvice {
@@ -45,25 +42,12 @@ public class GlobalControllerAdvice {
 
 	}
 
-	/*
-	 * @ResponseBody
-	 * 
-	 * @ExceptionHandler(MethodArgumentNotValidException.class) public
-	 * ResponseEntity<Object>
-	 * handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-	 * 
-	 * return new ResponseEntity<Object>( new ApiError(new Date(),
-	 * "Validation failed", e.getBindingResult().toString()),
-	 * HttpStatus.BAD_REQUEST);
-	 * 
-	 * }
-	 * 
-	 * @ExceptionHandler(MissingServletRequestParameterException.class) public
-	 * ResponseEntity<Object> processMissingServletRequestParameterError(
-	 * MissingServletRequestParameterException e) { return new
-	 * ResponseEntity<Object>( new ApiError(new Date(), e.getParameterName() +
-	 * " parameter is missing", e.getLocalizedMessage()), HttpStatus.BAD_REQUEST); }
-	 * 
-	 */
+	@ExceptionHandler({ MethodArgumentTypeMismatchException.class })
+	public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
+			WebRequest request) {
+		String error = ex.getName() + " should be of type " + ex.getRequiredType().getName();
 
+		ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), error);
+		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+	}
 }

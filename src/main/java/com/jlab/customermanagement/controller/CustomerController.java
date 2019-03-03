@@ -40,5 +40,27 @@ public class CustomerController {
 
 		return ResponseEntity.created(location).build();
 	}
+	
+	/**
+	 * Function to get details for a given customer id
+	 * 
+	 * @param id Id of the customer
+	 * @return Details of the customer
+	 */
+	@GetMapping("/customers/{customerId}")
+	public Customer one(@PathVariable long customerId) {
+		return customerService.one(customerId);
+	}
+
+	/**
+	 * 
+	 * Function to get details for all customers
+	 * 
+	 * @return
+	 */
+	@GetMapping("/customers")
+	public List<Customer> all() {
+		return customerService.all();
+	}
 
 }
